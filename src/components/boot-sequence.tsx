@@ -5,14 +5,15 @@ import React, { useState, useEffect } from 'react';
 interface BootSequenceProps {
     platformName: string;
     onComplete: () => void;
+    customSequence?: string[];
 }
 
-export const BootSequence = ({ platformName, onComplete }: BootSequenceProps) => {
+export const BootSequence = ({ platformName, onComplete, customSequence }: BootSequenceProps) => {
     const [lines, setLines] = useState<string[]>([]);
     
     useEffect(() => {
-        // Simple mock implementation of varied boot speeds and text
-        const sequence = [
+        // Use custom sequence if available, or fall back to generic
+        const sequence = customSequence || [
             `BIOS ITEM-X VER 1.0.2`,
             `Copyright (C) 1970-1990`,
             `${platformName} SYSTEM`,
@@ -43,12 +44,12 @@ export const BootSequence = ({ platformName, onComplete }: BootSequenceProps) =>
         }, 300); 
 
         return () => clearInterval(interval);
-    }, [platformName, onComplete]);
+    }, [platformName, onComplete, customSequence]);
 
     return (
-        <div className="font-retro text-lg leading-relaxed uppercase">
+        <div className="font-retro text-lg leading-relaxed uppercase whitespace-pre-wrap">
             {lines.map((line, i) => (
-                <div key={i}>{line}</div>
+                <div key={i}>{line || "\u00A0"}</div>
             ))}
             <div className="animate-pulse">_</div>
         </div>

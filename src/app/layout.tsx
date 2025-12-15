@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { VT323 } from "next/font/google";
 import "./globals.css";
+import { DisplayProvider } from "@/context/display-context";
 
 const vt323 = VT323({
   weight: "400",
@@ -23,7 +24,9 @@ export default function RootLayout({
       <body
         className={`${vt323.variable} antialiased bg-retro-dark text-retro-green h-screen w-screen overflow-hidden`}
       >
-        {children}
+        <DisplayProvider>
+            {children}
+        </DisplayProvider>
       </body>
     </html>
   );

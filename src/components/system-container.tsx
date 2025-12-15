@@ -10,9 +10,14 @@ import { Editor } from './programs/editor';
 import { WebMSXWrapper } from './emulators/webmsx-wrapper';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useDisplay } from '@/context/display-context';
 
 export const SystemContainer = ({ platform }: { platform: Platform }) => {
-    const [status, setStatus] = useState<'booting' | 'running'>('booting');
+    const { getEffectiveConfig } = useDisplay();
+    // Logic for initial state: if skipCustomBoot is true, start as running immediately
+    const [status, setStatus] = useState<'booting' | 'running'>(
+        platform.skipCustomBoot ? 'running' : 'booting'
+    );
     const [program, setProgram] = useState<null | 'pong' | 'editor'>(null);
     const [history, setHistory] = useState<{ type: 'input' | 'output', content: React.ReactNode }[]>([
         { type: 'output', content: `${platform.name.toUpperCase()} BASIC V1.0` },
@@ -20,6 +25,8 @@ export const SystemContainer = ({ platform }: { platform: Platform }) => {
         { type: 'output', content: 'READY.' },
     ]);
     const router = useRouter();
+
+    const config = getEffectiveConfig(platform);
 
     const handleCommand = (cmd: string) => {
         const cleanCmd = cmd.trim().toUpperCase();
@@ -78,14 +85,15 @@ README   TXT      1,024  01-01-${platform.year}
     return (
         <CRTWrapper 
             className={cn("h-screen w-screen transform transition-all", getThemeClass(platform.theme))}
-            monitorType={platform.displayConfig?.monitorType}
-            curvature={platform.displayConfig?.curvature}
-            scanlineIntensity={platform.displayConfig?.scanlineIntensity}
-            noPadding={platform.displayConfig?.noPadding}
+            monitorType={config.monitorType}
+            curvature={config.curvature}
+            scanlineIntensity={config.scanlineIntensity}
+            noPadding={config.noPadding}
         >
             {status === 'booting' && (
                 <BootSequence 
                     platformName={platform.name}
+                    customSequence={platform.bootSequence}
                     onComplete={() => setStatus('running')} 
                 />
             )}
@@ -107,7 +115,7 @@ README   TXT      1,024  01-01-${platform.year}
                 <div className="h-full flex flex-col font-retro text-lg relative p-8">
                     <Terminal 
                         history={history}
-                        prompt={platform.type === 'terminal' ? '>' : 'C:\\>'}
+                        prompt={platform.customPrompt || (platform.type === 'terminal' ? '>' : 'C:\\>')}
                         onCommand={handleCommand}
                     />
 
