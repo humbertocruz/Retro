@@ -1,3 +1,11 @@
+export interface VirtualFile {
+    name: string;
+    type: 'file' | 'dir';
+    size?: string;
+    date?: string;
+    content?: string;
+}
+
 export interface Platform {
     id: string;
     name: string;
@@ -14,6 +22,9 @@ export interface Platform {
     skipCustomBoot?: boolean;
     bootSequence?: string[];
     customPrompt?: string;
+    fileSystem?: VirtualFile[];
+    driveName?: string; // e.g. "C:", "DRIVE 1"
+    isHardDrive?: boolean;
 }
 
 export const ERAS: Platform[] = [
@@ -26,6 +37,11 @@ export const ERAS: Platform[] = [
         type: 'terminal',
         displayConfig: { monitorType: 'monochrome', curvature: 'high', scanlineIntensity: 'high' },
         customPrompt: 'READY >',
+        driveName: 'TAPE UNIT 1',
+        fileSystem: [
+            { name: 'CENSUS_DATA', type: 'file', size: '128 BLKS' },
+            { name: 'CALC_ROUTINE', type: 'file', size: '45 BLKS' }
+        ],
         bootSequence: [
             "UNIVAC SYSTEM READY",
             "LOAD SUPERVISOR...",
@@ -43,6 +59,13 @@ export const ERAS: Platform[] = [
         type: 'terminal',
         displayConfig: { monitorType: 'monochrome', curvature: 'high', scanlineIntensity: 'high' },
         customPrompt: '$',
+        driveName: '/usr/home',
+        isHardDrive: true,
+        fileSystem: [
+            { name: 'research_notes.txt', type: 'file', size: '2KB', date: 'Oct 12' },
+            { name: 'fortran_code', type: 'dir' },
+            { name: 'mail', type: 'file', size: '1KB', date: 'Oct 14' }
+        ],
         bootSequence: [
             "VT100 TERMINAL ONLINE",
             "CONNECTION ESTABLISHED",
@@ -61,6 +84,11 @@ export const ERAS: Platform[] = [
         type: 'cli',
         displayConfig: { monitorType: 'monochrome', curvature: 'medium', scanlineIntensity: 'medium' },
         customPrompt: '\\',
+        driveName: 'CASSETTE INTERFACE',
+        fileSystem: [
+            { name: 'BASIC', type: 'file', size: '4096' },
+            { name: 'STAR TREK', type: 'file', size: '8192' }
+        ],
         bootSequence: [
             "\\", 
             "APPLE SYSTEM MONITOR",
@@ -77,6 +105,13 @@ export const ERAS: Platform[] = [
         type: 'cli',
         displayConfig: { monitorType: 'color-tv', curvature: 'medium', scanlineIntensity: 'medium' },
         customPrompt: ']',
+        driveName: 'DISK II',
+        fileSystem: [
+            { name: 'HELLO', type: 'file', size: '2' },
+            { name: 'APPLESOFT', type: 'file', size: '32' },
+            { name: 'BRICKOUT', type: 'file', size: '15' },
+            { name: 'LEMONADE', type: 'file', size: '22' }
+        ],
         bootSequence: [
             "APPLE II",
             "",
@@ -94,6 +129,12 @@ export const ERAS: Platform[] = [
         type: 'cli',
         displayConfig: { monitorType: 'monochrome', curvature: 'medium', scanlineIntensity: 'medium' },
         customPrompt: '>', // TRS-80 Level II Basic prompt
+        driveName: 'CASSETTE',
+        fileSystem: [
+            { name: 'SYSTEM', type: 'file' },
+            { name: 'BASIC', type: 'file' },
+            { name: 'DANCING DEMON', type: 'file' }
+        ],
         bootSequence: [
             "MEMORY SIZE?",
             "RADIO SHACK LEVEL II BASIC",
@@ -110,6 +151,12 @@ export const ERAS: Platform[] = [
         type: 'cli',
         displayConfig: { monitorType: 'color-tv', curvature: 'medium', scanlineIntensity: 'medium' },
         customPrompt: '>', // Simplified for our purposes
+        driveName: 'TAPE RECORDER',
+        fileSystem: [
+             { name: 'MANIC MINER', type: 'file' },
+             { name: 'JET SET WILLY', type: 'file' },
+             { name: 'HORACE GOES SKIING', type: 'file' }
+        ],
         bootSequence: [
             "(c) 1982 Sinclair Research Ltd",
             "",
@@ -125,7 +172,13 @@ export const ERAS: Platform[] = [
         theme: 'color', 
         type: 'cli',
         displayConfig: { monitorType: 'color-tv', curvature: 'medium', scanlineIntensity: 'medium' },
-        customPrompt: 'READY.', // C64 behavior is tricky, it prints READY. then waits on new line. We might simulate prompt as empty or block cursor. Let's use empty string as prompt but previous line says READY.
+        customPrompt: 'READY.', 
+        driveName: 'Device 8',
+        fileSystem: [
+            { name: 'GIANA SISTERS', type: 'file', size: '145 BLOCKS' },
+            { name: 'COMMANDO', type: 'file', size: '130 BLOCKS' },
+            { name: 'BUBBLE BOBBLE', type: 'file', size: '122 BLOCKS' }
+        ],
         bootSequence: [
             "    **** COMMODORE 64 BASIC V2 ****",
             "",
@@ -143,6 +196,15 @@ export const ERAS: Platform[] = [
         type: 'cli',
         displayConfig: { monitorType: 'monochrome', curvature: 'low', scanlineIntensity: 'medium' },
         customPrompt: 'C:\\>',
+        driveName: 'Drive C',
+        isHardDrive: true,
+        fileSystem: [
+            { name: 'COMMAND.COM', type: 'file', size: '25,483', date: '01-01-85' },
+            { name: 'AUTOEXEC.BAT', type: 'file', size: '128', date: '01-01-85' },
+            { name: 'CONFIG.SYS', type: 'file', size: '45', date: '01-01-85' },
+            { name: 'DOCS', type: 'dir' },
+            { name: 'GAMES', type: 'dir' }
+        ],
         bootSequence: [
             "Starting MS-DOS...",
             "",
@@ -171,7 +233,14 @@ export const ERAS: Platform[] = [
         theme: 'color',
         type: 'gui',
         displayConfig: { monitorType: 'color-tv', curvature: 'low', scanlineIntensity: 'low' },
-        customPrompt: '1>', // Amiga Shell prompt
+        customPrompt: '1>', 
+        driveName: 'DF0',
+        fileSystem: [
+            { name: 'Workbench', type: 'dir' },
+            { name: 'Utilities', type: 'dir' },
+            { name: 'Trashcan', type: 'dir' },
+            { name: 'Demos', type: 'dir' }
+        ],
         bootSequence: [
             "AmigaDOS 1.0",
             "",
@@ -190,6 +259,13 @@ export const ERAS: Platform[] = [
         type: 'gui',
         displayConfig: { monitorType: 'color-tv', curvature: 'low', scanlineIntensity: 'none' },
         customPrompt: 'C:\\WINDOWS>',
+        driveName: 'Disk C',
+        isHardDrive: true,
+        fileSystem: [
+             { name: 'WIN.COM', type: 'file', size: '24KB' },
+             { name: 'SYSTEM.INI', type: 'file', size: '2KB' },
+             { name: 'COMMAND.COM', type: 'file', size: '45KB' }
+        ],
         bootSequence: [
             "Starting Windows 95...",
             "",
@@ -208,13 +284,21 @@ export const ERAS: Platform[] = [
         type: 'terminal',
         displayConfig: { monitorType: 'monochrome', curvature: 'low', scanlineIntensity: 'none' },
         customPrompt: '[user@archlinux ~]$',
+        driveName: '/home/user',
+        isHardDrive: true,
+        fileSystem: [
+            { name: 'projects', type: 'dir' },
+            { name: '.config', type: 'dir' },
+            { name: '.zshrc', type: 'file', size: '4KB' },
+            { name: 'todo.md', type: 'file', size: '1KB' }
+        ],
         bootSequence: [
             "Arch Linux 6.8.1-arch1-1 (tty1)",
             "",
             "archlinux login: user",
             "Password: ",
             "Last login: Mon Dec 15 10:00:00 on tty1",
-            "[user@archlinux ~]$" // Boot sequence ends with prompt line usually, but our terminal component will re-add prompt
+            "[user@archlinux ~]$" 
         ]
     }
 ];

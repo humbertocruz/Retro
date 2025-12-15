@@ -37,31 +37,100 @@ export const SystemContainer = ({ platform }: { platform: Platform }) => {
         // Process Command
         let output: React.ReactNode = "FILE NOT FOUND OR BAD COMMAND.";
 
+        // Check for aliases depending on platform
+        let isDirCommand = cleanCmd === 'DIR';
+        if (platform.id.includes('apple') && cleanCmd === 'CATALOG') isDirCommand = true;
+        if (platform.id.includes('sh') || platform.id.includes('terminal') || platform.id.includes('unix') || platform.id.includes('linux')) {
+             if (cleanCmd === 'LS' || cleanCmd === 'LS -LA') isDirCommand = true;
+        }
+        if (platform.id.includes('c64') && (cleanCmd === 'LIST' || cleanCmd === 'LOAD"$",8')) isDirCommand = true;
+
         if (cleanCmd === 'HELP') {
             output = `AVAILABLE COMMANDS:
-- DIR: LIST FILES
+- ${platform.id.includes('apple') ? 'CATALOG' : (platform.type === 'terminal' ? 'LS' : 'DIR')}: LIST FILES
 - PONG: RUN TENNIS GAME
 - EDIT: RUN TEXT EDITOR
 - CLS: CLEAR SCREEN
 - EXIT: RETURN TO REALITY`;
-        } else if (cleanCmd === 'DIR') {
-             output = `VOLUME IN DRIVE C IS RETRO_SIM
- Directory of C:\\
-
-COMMAND  COM     25,483  01-01-${platform.year}
-PONG     EXE     15,360  01-01-${platform.year}
-EDITOR   EXE      8,192  01-01-${platform.year}
-CONFIG   SYS        128  01-01-${platform.year}
-README   TXT      1,024  01-01-${platform.year}
-        5 File(s)     49,159 bytes
-        1 Dir(s)   20,480,000 bytes free`;
-        } else if (cleanCmd === 'CLS' || cleanCmd === 'CLEAR') {
+        } else if (isDirCommand) {
+             const drive = platform.driveName || 'C:';
+             const files = platform.fileSystem || [];
+             
+             if (platform.id.includes('dos') || platform.id.includes('win')) {
+                // DOS Style
+                output = (
+                    <div className="flex flex-col">
+                        <span> Volume in drive {drive[0]} is {platform.isHardDrive ? 'HARD_DISK' : 'RETRO_DISK'}</span>
+                        <span> Directory of {drive}\</span>
+                        <br/>
+                        {files.map((f, i) => (
+                            <div key={i} className="flex justify-between w-64">
+                                <span>{f.name.padEnd(8)} {f.type === 'dir' ? '<DIR>' : (f.content?.toUpperCase() || 'EXE')}</span>
+                                <span>{f.size || '0'}</span>
+                            </div>
+                        ))}
+                        <div className="flex justify-between w-64 mt-2">
+                             <span>{files.length} File(s)</span>
+                             <span>{Math.floor(Math.random() * 50000)} bytes free</span>
+                        </div>
+                    </div>
+                );
+             } else if (platform.id.includes('apple')) {
+                // Apple II Style
+                output = (
+                    <div className="flex flex-col">
+                        <span>DISK VOLUME 254</span>
+                        <br/>
+                        {files.map((f, i) => (
+                            <div key={i} className="pl-4">
+                                {f.name === 'HELLO' ? '*' : ' '} {String.fromCharCode(65 + i)} 00{f.size || '2'} {f.name}
+                            </div>
+                        ))}
+                        <br/>
+                    </div>
+                );
+             } else if (platform.id.includes('c64')) {
+                 // C64 Style
+                 output = (
+                    <div className="flex flex-col">
+                        <span>0 .&quot;{platform.isHardDrive ? 'HARD DISK' : 'RETRO DISK'}&quot;  88 2A</span>
+                        {files.map((f, i) => (
+                            <div key={i}>
+                                {f.size || '10'}   &quot;{f.name}&quot;               PRG
+                            </div>
+                        ))}
+                        <span>64 BLOCKS FREE.</span>
+                    </div>
+                 );
+             } else if (platform.type === 'terminal') {
+                // Unix Style
+                output = (
+                    <div className="flex flex-col">
+                         {files.map((f, i) => (
+                            <span key={i} className={f.type === 'dir' ? 'text-retro-green font-bold' : ''}>
+                                {f.type === 'dir' ? 'd' : '-'}rw-r--r-- 1 user group {f.size || '4096'} {f.date || 'Dec 15'} {f.name}
+                            </span>
+                        ))}
+                    </div>
+                );
+             } else {
+                 // Fallback Generic
+                 output = (
+                    <div>
+                        <div>DRIVE: {drive}</div>
+                        {files.map((f, i) => (
+                            <div key={i}>- {f.name} ({f.size || 'N/A'})</div>
+                        ))}
+                    </div>
+                 );
+             }
+        } else if (cleanCmd === 'CLS' || cleanCmd === 'CLEAR' || cleanCmd === 'HOME') {
             setHistory([]);
             return;
         } else if (cleanCmd === 'EXIT') {
             router.push('/');
             return;
-        } else if (cleanCmd === 'PONG' || cleanCmd === 'RUN PONG') {
+        } else if (cleanCmd === 'PONG' || cleanCmd === 'RUN PONG' || cleanCmd === 'RUN "PONG"') {
             setProgram('pong');
             return;
         } else if (cleanCmd === 'EDIT' || cleanCmd === 'RUN EDIT') {
