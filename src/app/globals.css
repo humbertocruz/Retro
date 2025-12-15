@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --font-retro: var(--font-retro);
+  
+  --color-retro-green: #33ff00;
+  --color-retro-amber: #ffb000;
+  --color-retro-dark: #111;
+  --color-retro-screen: #0a0f0a;
+
+  --animate-scanline: scanline 8s linear infinite;
+  
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+}
+
+@layer utilities {
+    .text-glow {
+        text-shadow: 0 0 2px currentColor, 0 0 5px currentColor;
+    }
+}
+
+body {
+  background-color: var(--color-retro-dark);
+  color: var(--color-retro-green);
+  font-family: var(--font-retro);
+  margin: 0;
+  overflow: hidden;
+}
