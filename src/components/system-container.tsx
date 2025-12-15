@@ -7,6 +7,7 @@ import { CRTWrapper } from './crt-wrapper';
 import { Terminal } from './terminal';
 import { Pong } from './programs/pong';
 import { Editor } from './programs/editor';
+import { WebMSXWrapper } from './emulators/webmsx-wrapper';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -75,7 +76,13 @@ README   TXT      1,024  01-01-${platform.year}
     };
 
     return (
-        <CRTWrapper className={cn("h-screen w-screen p-8", getThemeClass(platform.theme))}>
+        <CRTWrapper 
+            className={cn("h-screen w-screen transform transition-all", getThemeClass(platform.theme))}
+            monitorType={platform.displayConfig?.monitorType}
+            curvature={platform.displayConfig?.curvature}
+            scanlineIntensity={platform.displayConfig?.scanlineIntensity}
+            noPadding={platform.displayConfig?.noPadding}
+        >
             {status === 'booting' && (
                 <BootSequence 
                     platformName={platform.name}
@@ -83,8 +90,21 @@ README   TXT      1,024  01-01-${platform.year}
                 />
             )}
             
-            {status === 'running' && !program && (
-                <div className="h-full flex flex-col font-retro text-lg relative">
+            {status === 'running' && !program && platform.id === 'msx-1985' && (
+                <div className="h-full w-full relative z-10">
+                    <WebMSXWrapper platformId={platform.id} />
+                    {/* Escape hatch */}
+                    <button 
+                        onClick={() => router.push('/')}
+                        className="absolute bottom-4 right-4 border border-white/20 bg-black/50 text-white px-4 py-2 hover:bg-white/10 text-sm transition-all z-50 pointer-events-auto backdrop-blur-sm"
+                    >
+                        EJECT CARTRIDGE
+                    </button>
+                </div>
+            )}
+
+            {status === 'running' && !program && platform.id !== 'msx-1985' && (
+                <div className="h-full flex flex-col font-retro text-lg relative p-8">
                     <Terminal 
                         history={history}
                         prompt={platform.type === 'terminal' ? '>' : 'C:\\>'}

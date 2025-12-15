@@ -5,6 +5,12 @@ export interface Platform {
     year: number;
     theme: 'amber' | 'green' | 'color' | 'monochrome' | 'white';
     type: 'terminal' | 'cli' | 'gui';
+    displayConfig?: {
+        monitorType: 'monochrome' | 'color-tv';
+        curvature: 'high' | 'medium' | 'low';
+        scanlineIntensity: 'high' | 'medium' | 'low' | 'none';
+        noPadding?: boolean;
+    };
 }
 
 export const ERAS: Platform[] = [
@@ -14,7 +20,12 @@ export const ERAS: Platform[] = [
         description: 'University research system. Pure text.',
         year: 1970,
         theme: 'amber',
-        type: 'terminal'
+        type: 'terminal',
+        displayConfig: {
+            monitorType: 'monochrome',
+            curvature: 'high',
+            scanlineIntensity: 'high'
+        }
     },
     {
         id: 'apple-1978',
@@ -22,7 +33,12 @@ export const ERAS: Platform[] = [
         description: '8-bit power in your home.',
         year: 1978,
         theme: 'green',
-        type: 'cli'
+        type: 'cli',
+        displayConfig: {
+            monitorType: 'monochrome',
+            curvature: 'medium',
+            scanlineIntensity: 'medium'
+        }
     },
     {
         id: 'dos-1985',
@@ -30,6 +46,25 @@ export const ERAS: Platform[] = [
         description: 'Productivity and spreadsheets.',
         year: 1985,
         theme: 'white',
-        type: 'cli'
+        type: 'cli',
+        displayConfig: {
+            monitorType: 'monochrome',
+            curvature: 'low',
+            scanlineIntensity: 'medium'
+        }
+    },
+    {
+        id: 'msx-1985',
+        name: 'MSX SYSTEM',
+        description: 'The standard for home computing.',
+        year: 1985,
+        theme: 'color',
+        type: 'gui',
+        displayConfig: {
+            monitorType: 'color-tv',
+            curvature: 'low',
+            scanlineIntensity: 'low',
+            noPadding: true
+        }
     }
 ];
